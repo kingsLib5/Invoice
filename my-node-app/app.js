@@ -17,33 +17,34 @@ const sql = require('mssql');
 
 // MS SQL Server configuration
 const config = {
-  user: 'your-username',
-  password: 'your-password',
-  server: 'your-server-name', 
-  database: 'your-database-name',
+  user: "demouser",
+  password: "Demo@Access",
+  server: "172.245.142.62",
+  port: 1455,
+  database: "demodb",
   options: {
-    encrypt: true, // Use this if you're on Windows Azure
-    trustServerCertificate: true // Use this if you are connecting to a local server
+    encrypt: false, // Use this if you're on Windows Azure
+    // trustServerCertificate: true // Use this if you are connecting to a local server
   }
 };
 
 app.get('/', (req, res) => {
   sql.connect(config, err => {
     if (err) {
-      console.log('Error connecting to the database:', err);
-      res.send('Database connection error');
+      console.error('Error connecting to the database:', err);
+      res.send('Database connection error: ' + err.message);
       return;
     }
 
     const request = new sql.Request();
-    request.query('SELECT 1 AS number', (err, result) => {
+    request.query('SELECT * FROM SalesDetails', (err, result) => {
       if (err) {
-        console.log('Query error:', err);
-        res.send('Query error');
+        console.error('Query error:', err);
+        res.send('Query error: ' + err.message);
         return;
       }
 
-      res.send(`Query result: ${result.recordset[0].number}`);
+      res.json(result.recordset);
     });
   });
 });
@@ -51,3 +52,4 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+  
